@@ -43,3 +43,56 @@ def get_symptoms(patient_id):
     db = get_db()
     cursor = db.symptoms.find({"PatientID": str(patient_id)})
     return cursor_to_df(cursor, rename_id_to='SymptomID')
+
+# --- GCS Score Operations ---
+def add_gcs_score(patient_id, eye, verbal, motor):
+    total = eye + verbal + motor
+    db = get_db()
+    db.gcs_scores.insert_one({
+        "PatientID": str(patient_id),
+        "EyeScore": eye,
+        "VerbalScore": verbal,
+        "MotorScore": motor,
+        "TotalScore": total,
+        "RecordedAt": datetime.now()
+    })
+
+def get_gcs_scores(patient_id):
+    db = get_db()
+    cursor = db.gcs_scores.find({"PatientID": str(patient_id)}).sort("RecordedAt", 1)
+    return cursor_to_df(cursor, rename_id_to='GCSID')
+
+# --- Reflex Test Operations ---
+def add_reflex_test(patient_id, test_type, body_part, result, score, notes):
+    db = get_db()
+    db.reflex_tests.insert_one({
+        "PatientID": str(patient_id),
+        "TestType": test_type,
+        "BodyPart": body_part,
+        "Result": result,
+        "Score": score,
+        "Notes": notes,
+        "TestTime": datetime.now()
+    })
+
+def get_reflex_tests(patient_id):
+    db = get_db()
+    cursor = db.reflex_tests.find({"PatientID": str(patient_id)})
+    return cursor_to_df(cursor, rename_id_to='TestID')
+
+# --- Localization Operations ---
+def add_localization(patient_id, region, diagnosis, algorithm, confidence):
+    db = get_db()
+    db.localizations.insert_one({
+        "PatientID": str(patient_id),
+        "Region": region,
+        "Diagnosis": diagnosis,
+        "AlgorithmUsed": algorithm,
+        "ConfidenceScore": confidence,
+        "GeneratedAt": datetime.now()
+    })
+
+def get_localizations(patient_id):
+    db = get_db()
+    cursor = db.localizations.find({"PatientID": str(patient_id)})
+    return cursor_to_df(cursor, rename_id_to='LocalizationID')
