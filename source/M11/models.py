@@ -96,3 +96,58 @@ def get_localizations(patient_id):
     db = get_db()
     cursor = db.localizations.find({"PatientID": str(patient_id)})
     return cursor_to_df(cursor, rename_id_to='LocalizationID')
+
+# --- Advanced Analytical Queries ---
+def get_seizure_frequency():
+    """Group seizures by day/month for trend analysis"""
+    db = get_db()
+    pipeline = [
+        {"$match": {"SymptomType": "Seizure"}},
+        {"$project": {
+            "Date": {
+                "$dateToString": {"format": "%Y-%m-%d", "date": "$RecordedAt"}
+            }
+        }},
+        {"$group": {
+            "_id": "$Date",
+            "SeizureCount": {"$sum": 1}
+        }},
+        {"$sort": {"_id": 1}}
+    ]
+    cursor = db.symptoms.aggregate(pipeline)
+    df = pd.DataFrame(list(cursor))
+    if not df.empty:
+        df.rename(columns={'_id': 'Date'}, inplace=True)
+    return df
+
+def get_critical_patients():
+    """Returns patients with low GCS scores (Total < 8 indicates severe coma)"""
+    db = get_db()
+    pipeline = [
+        {"$match": {"TotalScore": {"$lte": 8}}},
+        {"$sort": {"RecordedAt": -1}},
+        {
+            "$addFields": {
+                "PatientObjectId": {"$toObjectId": "$PatientID"}
+            }
+        },
+        {"$lookup": {
+            "from": "patients",
+            "localField": "PatientObjectId",
+            "foreignField": "_id",
+            "as": "patient_info"
+        }},
+        {"$unwind": "$patient_info"},
+        {"$project": {
+            "FirstName": "$patient_info.FirstName",
+            "LastName": "$patient_info.LastName",
+            "Age": "$patient_info.Age",
+            "TotalScore": 1,
+            "RecordedAt": 1,
+            "_id": 0
+        }},
+        {"$sort": {"TotalScore": 1, "RecordedAt": -1}}
+    ]
+    cursor = db.gcs_scores.aggregate(pipeline)
+    df = pd.DataFrame(list(cursor))
+    return df
