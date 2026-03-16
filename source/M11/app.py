@@ -48,59 +48,59 @@ if choice == "Patient Management":
         else:
             st.info("No patients found.")
 
-elif choice == "Symptom Tracking":
-    st.header("Symptom Tracking")
-    patients_df = models.get_patients()
-    if patients_df.empty:
-        st.warning("Please add a patient first in the Patient Management section.")
-    else:
-        patient_options = patients_df['PatientID'].astype(str) + " - " + patients_df['FirstName'] + " " + patients_df['LastName']
-        selected_patient = st.selectbox("Select Patient", patient_options)
-        patient_id = selected_patient.split(" - ")[0]
+# elif choice == "Symptom Tracking":
+#     st.header("Symptom Tracking")
+#     patients_df = models.get_patients()
+#     if patients_df.empty:
+#         st.warning("Please add a patient first in the Patient Management section.")
+#     else:
+#         patient_options = patients_df['PatientID'].astype(str) + " - " + patients_df['FirstName'] + " " + patients_df['LastName']
+#         selected_patient = st.selectbox("Select Patient", patient_options)
+#         patient_id = selected_patient.split(" - ")[0]
 
-        with st.form("symptom_form"):
-            symptom_type = st.selectbox("Symptom Type", ["Headache", "Seizure", "Weakness", "Numbness", "Vision changes", "Other"])
-            severity = st.selectbox("Severity", ["Mild", "Moderate", "Severe", "Critical"])
-            description = st.text_area("Description")
-            submit = st.form_submit_button("Record Symptom")
-            if submit:
-                models.add_symptom(patient_id, symptom_type, severity, description)
-                st.success("Symptom Recorded!")
+#         with st.form("symptom_form"):
+#             symptom_type = st.selectbox("Symptom Type", ["Headache", "Seizure", "Weakness", "Numbness", "Vision changes", "Other"])
+#             severity = st.selectbox("Severity", ["Mild", "Moderate", "Severe", "Critical"])
+#             description = st.text_area("Description")
+#             submit = st.form_submit_button("Record Symptom")
+#             if submit:
+#                 models.add_symptom(patient_id, symptom_type, severity, description)
+#                 st.success("Symptom Recorded!")
 
-        st.subheader("Patient's Symptoms")
-        st.dataframe(models.get_symptoms(patient_id))
+#         st.subheader("Patient's Symptoms")
+#         st.dataframe(models.get_symptoms(patient_id))
 
-elif choice == "GCS Tracker":
-    st.header("Glasgow Coma Scale (GCS) Tracker")
-    patients_df = models.get_patients()
-    if patients_df.empty:
-        st.warning("Please add a patient first in the Patient Management section.")
-    else:
-        patient_options = patients_df['PatientID'].astype(str) + " - " + patients_df['FirstName'] + " " + patients_df['LastName']
-        selected_patient = st.selectbox("Select Patient", patient_options, key="gcs")
-        patient_id = selected_patient.split(" - ")[0]
+# elif choice == "GCS Tracker":
+#     st.header("Glasgow Coma Scale (GCS) Tracker")
+#     patients_df = models.get_patients()
+#     if patients_df.empty:
+#         st.warning("Please add a patient first in the Patient Management section.")
+#     else:
+#         patient_options = patients_df['PatientID'].astype(str) + " - " + patients_df['FirstName'] + " " + patients_df['LastName']
+#         selected_patient = st.selectbox("Select Patient", patient_options, key="gcs")
+#         patient_id = selected_patient.split(" - ")[0]
     
-        col1, col2 = st.columns(2)
-        with col1:
-            st.subheader("Record GCS")
-            with st.form("gcs_form"):
-                eye = st.slider("Eye Opening (1-4)", 1, 4, 4)
-                verbal = st.slider("Verbal Response (1-5)", 1, 5, 5)
-                motor = st.slider("Motor Response (1-6)", 1, 6, 6)
-                submit = st.form_submit_button("Save GCS Score")
-                if submit:
-                    models.add_gcs_score(patient_id, eye, verbal, motor)
-                    st.success(f"GCS Recorded! Total: {eye+verbal+motor}")
+#         col1, col2 = st.columns(2)
+#         with col1:
+#             st.subheader("Record GCS")
+#             with st.form("gcs_form"):
+#                 eye = st.slider("Eye Opening (1-4)", 1, 4, 4)
+#                 verbal = st.slider("Verbal Response (1-5)", 1, 5, 5)
+#                 motor = st.slider("Motor Response (1-6)", 1, 6, 6)
+#                 submit = st.form_submit_button("Save GCS Score")
+#                 if submit:
+#                     models.add_gcs_score(patient_id, eye, verbal, motor)
+#                     st.success(f"GCS Recorded! Total: {eye+verbal+motor}")
 
-        with col2:
-            st.subheader("GCS Trend Analysis")
-            gcs_df = models.get_gcs_scores(patient_id)
-            if not gcs_df.empty:
-                fig = px.line(gcs_df, x="RecordedAt", y="TotalScore", title="GCS Total Score Over Time", markers=True, range_y=[0, 16])
-                st.plotly_chart(fig, use_container_width=True)
-                st.dataframe(gcs_df)
-            else:
-                st.info("No GCS scores recorded for this patient.")
+#         with col2:
+#             st.subheader("GCS Trend Analysis")
+#             gcs_df = models.get_gcs_scores(patient_id)
+#             if not gcs_df.empty:
+#                 fig = px.line(gcs_df, x="RecordedAt", y="TotalScore", title="GCS Total Score Over Time", markers=True, range_y=[0, 16])
+#                 st.plotly_chart(fig, use_container_width=True)
+#                 st.dataframe(gcs_df)
+#             else:
+#                 st.info("No GCS scores recorded for this patient.")
 
 elif choice == "Reflex & Coordination Test":
     st.header("Reflex and Coordination Tests")
