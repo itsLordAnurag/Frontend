@@ -102,29 +102,29 @@ elif choice == "GCS Tracker":
             else:
                 st.info("No GCS scores recorded for this patient.")
 
-# elif choice == "Reflex & Coordination Test":
-#     st.header("Reflex and Coordination Tests")
-#     patients_df = models.get_patients()
-#     if patients_df.empty:
-#         st.warning("Please add a patient first in the Patient Management section.")
-#     else:
-#         patient_options = patients_df['PatientID'].astype(str) + " - " + patients_df['FirstName'] + " " + patients_df['LastName']
-#         selected_patient = st.selectbox("Select Patient", patient_options, key="reflex")
-#         patient_id = selected_patient.split(" - ")[0]
+elif choice == "Reflex & Coordination Test":
+    st.header("Reflex and Coordination Tests")
+    patients_df = models.get_patients()
+    if patients_df.empty:
+        st.warning("Please add a patient first in the Patient Management section.")
+    else:
+        patient_options = patients_df['PatientID'].astype(str) + " - " + patients_df['FirstName'] + " " + patients_df['LastName']
+        selected_patient = st.selectbox("Select Patient", patient_options, key="reflex")
+        patient_id = selected_patient.split(" - ")[0]
         
-#         with st.form("reflex_form"):
-#             test_type = st.selectbox("Exam Component", ["Cranial nerves", "Motor", "Sensory", "Coordination", "Gait"])
-#             body_part = st.text_input("Body Part (e.g., Left Leg, Right Arm, Face)")
-#             result = st.selectbox("Result", ["Normal", "Abnormal", "Absent", "Hyperreflexia", "Hyporeflexia"])
-#             score = st.text_input("Score (e.g., 2+, 1+, 0)")
-#             notes = st.text_area("Notes")
-#             submit = st.form_submit_button("Record Test")
-#             if submit:
-#                 models.add_reflex_test(patient_id, test_type, body_part, result, score, notes)
-#                 st.success("Reflex test recorded.")
+        with st.form("reflex_form"):
+            test_type = st.selectbox("Exam Component", ["Cranial nerves", "Motor", "Sensory", "Coordination", "Gait"])
+            body_part = st.text_input("Body Part (e.g., Left Leg, Right Arm, Face)")
+            result = st.selectbox("Result", ["Normal", "Abnormal", "Absent", "Hyperreflexia", "Hyporeflexia"])
+            score = st.text_input("Score (e.g., 2+, 1+, 0)")
+            notes = st.text_area("Notes")
+            submit = st.form_submit_button("Record Test")
+            if submit:
+                models.add_reflex_test(patient_id, test_type, body_part, result, score, notes)
+                st.success("Reflex test recorded.")
                 
-#         st.subheader("Patient's Test Results")
-#         st.dataframe(models.get_reflex_tests(patient_id))
+        st.subheader("Patient's Test Results")
+        st.dataframe(models.get_reflex_tests(patient_id))
 
 elif choice == "Neurological Localization":
     st.header("Neurological Localization")
