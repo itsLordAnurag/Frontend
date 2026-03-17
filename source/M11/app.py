@@ -166,7 +166,7 @@ elif choice == "Advanced Reports":
     st.write("Patients with severe coma (GCS Total <= 8).")
     critical_df = models.get_critical_patients()
     if not critical_df.empty:
-        st.error(" Critical patients identified based on recent GCS scores.")
+        st.error("⚠️ Critical patients identified based on recent GCS scores.")
         st.dataframe(critical_df)
     else:
-        st.success("No critical patients matching severe coma criteria at the moment.")
+        st.success("✅ No critical patients matching severe coma criteria at the moment.")
