@@ -18,7 +18,7 @@ menu = [
     "Neurological Localization",
     "Advanced Reports"
 ]
-
+#Dashboard
 choice = st.sidebar.radio("Navigation", menu)
 
 if choice == "Patient Management":
