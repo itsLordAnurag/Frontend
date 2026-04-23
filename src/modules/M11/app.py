@@ -2,10 +2,16 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import requests
+import os
+from dotenv import load_dotenv
 
-API_URL = "http://127.0.0.1:8000"
+# Load environment variables from .env
+load_dotenv()
 
-st.set_page_config(page_title="Neurological Database", page_icon="🧠", layout="wide")
+# Extract the loaded variable into a Python variable so the rest of the code can use it
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8000") # defaults to localhost if missing
+
+st.set_page_config(page_title="Neurological Database", page_icon="🎃", layout="wide")
 st.title("Neurological Symptom Analysis Database")
 
 menu = [
@@ -203,7 +209,25 @@ elif choice == "Neurological Localization":
             patient_options = patients_df['PatientID'].astype(str) + " - " + patients_df['FirstName'] + " " + patients_df['LastName']
             selected_patient = st.selectbox("Select Patient", options=patient_options, key="loc")
             patient_id = selected_patient.split(" - ")[0]
-            
+        
+            st.subheader("Automated Localization Algorithm")
+            st.write("Run the Clinical Heuristics Algorithm based on the patient's recorded symptoms.")
+            if st.button("Run Diagnostic Algorithm"):
+                try:
+                    res = requests.post(f"{API_URL}/localization/auto/{patient_id}")
+                    if res.status_code == 200:
+                        data = res.json()
+                        if data.get("status") == "success":
+                            st.success(f"Algorithm Complete & Saved! Predicted Region: **{data['region']}** (Confidence: {data['confidence']}%)")
+                        else:
+                            st.warning(data.get("message"))
+                    else:
+                        st.error(f"API Error {res.status_code}: {res.text}")
+                except requests.exceptions.ConnectionError:
+                    st.error("Could not connect to the Backend API. Make sure FastAPI is running on port 8000.")
+                    
+            st.markdown("---")
+            st.subheader("Manual Localization Entry")
             with st.form("loc_form"):
                 region = st.text_input("Neuroanatomical Region (e.g., Frontal Lobe, Basal Ganglia, Brainstem)")
                 diagnosis = st.text_input("Diagnosis / Finding")
